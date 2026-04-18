@@ -7,7 +7,7 @@ export default function Navbar() {
   const role = localStorage.getItem("role");
 
   const isAdmin = role?.toUpperCase().includes("ROLE_ADMIN");
-
+  
   const logout = () => {
     localStorage.clear();
     navigate("/login");
