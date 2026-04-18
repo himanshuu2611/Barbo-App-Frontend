@@ -8,28 +8,30 @@ import PrivateRoute from "./components/PrivateRoute";
 import AdminPanel from "./pages/AdminPanel";
 import Signup from "./pages/Signup";
 import MyBookings from "./pages/MyBookings";
+
 function App() {
   const location = useLocation();
 
-  // 🔥 Hide navbar on auth pages
-  const hideNavbarRoutes = ["/", "/signup"];
+  // ✅ Hide navbar only on auth pages
+  const hideNavbarRoutes = ["/login", "/signup"];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 to-blue-100">
+    <div className="min-h-screen bg-gray-50">
 
+      {/* ✅ Navbar */}
       {!hideNavbarRoutes.includes(location.pathname) && <Navbar />}
 
       <Routes>
 
-        {/* 🔐 Auth */}
-        <Route path="/" element={<Login />} />
+        {/* 🔐 AUTH ROUTES */}
+        <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        {/* 👤 USER */}
+        {/* 👤 USER + ADMIN (Shared Access) */}
         <Route
           path="/barbers"
           element={
-            <PrivateRoute role="USER">
+            <PrivateRoute role={["ROLE_USER", "ROLE_ADMIN"]}>
               <Barbers />
             </PrivateRoute>
           }
@@ -38,8 +40,17 @@ function App() {
         <Route
           path="/services/:barberId"
           element={
-            <PrivateRoute role="USER">
+            <PrivateRoute role={["ROLE_USER", "ROLE_ADMIN"]}>
               <Services />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/booking"
+          element={
+            <PrivateRoute role={["ROLE_USER", "ROLE_ADMIN"]}>
+              <Booking />
             </PrivateRoute>
           }
         />
@@ -47,30 +58,24 @@ function App() {
         <Route
           path="/my-bookings"
           element={
-            <PrivateRoute role={["USER", "ADMIN"]}>
+            <PrivateRoute role={["ROLE_USER", "ROLE_ADMIN"]}>
               <MyBookings />
-            </PrivateRoute>
-          }
-         />
-
-        <Route
-          path="/booking"
-          element={
-            <PrivateRoute role="USER">
-              <Booking />
             </PrivateRoute>
           }
         />
 
-        {/* 👨‍💼 ADMIN */}
+        {/* 👨‍💼 ADMIN ONLY */}
         <Route
           path="/admin"
           element={
-            <PrivateRoute role="ADMIN">
+            <PrivateRoute role="ROLE_ADMIN">
               <AdminPanel />
             </PrivateRoute>
           }
         />
+
+        {/* 🏠 DEFAULT ROUTE */}
+        <Route path="/" element={<Login />} />
 
         {/* ❌ 404 */}
         <Route path="*" element={<h1 className="p-6">Page Not Found 😢</h1>} />
