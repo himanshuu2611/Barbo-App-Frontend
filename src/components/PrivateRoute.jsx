@@ -6,19 +6,21 @@ export default function PrivateRoute({ children, role }) {
 
   // 🔐 Not logged in
   if (!token) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
 
-  // 🔥 Role check (flexible)
+  // 🔥 Role-based access
   if (role) {
-    const allowedRoles = Array.isArray(role) ? role : [role];
+    const allowedRoles = Array.isArray(role)
+      ? role.map(r => r.toUpperCase())
+      : [role.toUpperCase()];
 
-    const hasAccess = allowedRoles.some(r =>
-      userRole?.includes(r.toUpperCase())
-    );
-
-    if (!hasAccess) {
-      return <Navigate to="/" />;
+    if (!allowedRoles.includes(userRole)) {
+      // 👉 Better UX: redirect based on role
+      if (userRole === "ROLE_ADMIN") {
+        return <Navigate to="/admin" replace />;
+      }
+      return <Navigate to="/barbers" replace />;
     }
   }
 
